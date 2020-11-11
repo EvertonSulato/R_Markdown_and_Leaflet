@@ -1,0 +1,58 @@
+---
+title: "R_Markdown_and_Leaflet"
+author: "ETSulato"
+date: "10/11/2020"
+output: html_document
+---
+
+# Overview
+
+The deforestation of the Amazon forest occurs for several reasons, such as illegal agriculture, natural disasters, urbanization, and mining, being frequent the occurence of burning and or wood extraction. This data set was obtained from a file "inpebrazilianamazonfires1999_2019", from the National Institute for Space Research (INPE), which brings the number of firespot in the Brazilian Amazon by state, month and year, from 1999 to 2019. The original data are public and were extracted from the INPE website on December 13, 2019. Available at https://www.kaggle.com/mbogernetto/brazilian-amazon-rainforest-degradation?select=inpe_brazilian_amazon_fires_1999_2019.csv.
+
+# Loading needed packages
+
+```{r}
+library(dplyr)
+library(leaflet)
+```
+
+# Reading the data 
+
+```{r setup}
+data<- read.csv("inpe_brazilian_amazon_fires_1999_2019.csv", header = T)
+
+head(data)
+```
+
+# Cleaning data
+
+```{r}
+data<-mutate(data, popups = paste("Year=", year, ", Firespots=", firespots))
+popups<-as.character(data$popups)
+```
+
+# Icon creation
+
+The image used for the icon was obtained from **https://www.flaticon.com/br/icone-gratis/**, and the icon was created by makeIcon() function.
+
+```{r}
+iconset <- iconList(
+        Fire = makeIcon(iconUrl = "https://www.flaticon.com/svg/static/icons/svg/785/785116.svg",iconWidth = 31*215/230, iconHeight = 31, iconAnchorX = 31*215/230/2, iconAnchorY = 16))
+```
+
+# Interactive map creation 
+
+The map was created using the Leaflet package. Enjoy it! 
+
+```{r}
+map<-leaflet() %>% 
+        addTiles() %>% 
+        addMarkers(lat=data$latitude, 
+                   lng=data$longitude, 
+                   icon = iconset,
+                   clusterOptions = markerClusterOptions(),
+                   popup = popups)
+
+map
+```
+
